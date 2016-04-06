@@ -116,7 +116,7 @@ public class MainFrame extends JFrame implements ActionListener {
 			paramMap.put("f", "0");
 			/////////
 			paramMap.put("uname", "32016");
-			paramMap.put("password", "123456a1");
+			paramMap.put("password", "123456a");
 			paramMap.put("numcode", numCode);
 			paramMap.put("verCode", abcCode);
 			paramMap.put("autoLogin", "true");
