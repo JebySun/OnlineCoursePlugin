@@ -8,12 +8,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.activation.MimeType;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
+import org.jsoup.Connection.Request;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 
@@ -24,6 +28,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	
 	private ImagePanel imgNumCode;
 	private ImagePanel imgABCCode;
+	private JLabel lblUserName;
 	private JTextField txtUserName;
 	private JTextField txtPassWord;
 	private JTextField txtNumCode;
@@ -33,7 +38,6 @@ public class MainFrame extends JFrame implements ActionListener {
 	private Map<String, String> cookiesMap;
 	
 	public MainFrame() {
-		
 		
 		initView();
 		
@@ -62,19 +66,21 @@ public class MainFrame extends JFrame implements ActionListener {
         Set<Entry<String, String>> entrySet = cookiesMap.entrySet();
         String cookiesStr = "";
         for (Map.Entry<String, String> entry : entrySet) {  
-            System.out.println(entry.getKey() + "=" + entry.getValue()); 
+//            System.out.println(entry.getKey() + "=" + entry.getValue()); 
             cookiesStr = cookiesStr + entry.getKey() + "=" + entry.getValue()+";";
         }  
         cookiesStr = cookiesStr.substring(0, cookiesStr.length()-1);
+		this.lblUserName = new JLabel("当前登录用户");
 		this.imgNumCode = new ImagePanel(200, 40, Config.NUM_CODE_PATH, cookiesStr);
 		this.imgABCCode = new ImagePanel(200, 40, Config.ABC_CODE_PATH, cookiesStr);
-		this.txtUserName = new JTextField("用户名");
+		this.txtUserName = new JTextField("帐号");
 		this.txtPassWord = new JTextField("密码");
 		this.txtNumCode = new JTextField("数字验证码");
 		this.txtABCCode = new JTextField("字母验证码");
 		this.btnLogin = new JButton("登录");
 		
 		this.setLayout(null);
+		this.add(this.lblUserName);
 		this.add(this.imgNumCode);
 		this.add(this.imgABCCode);
 		this.add(this.txtUserName);
@@ -83,14 +89,18 @@ public class MainFrame extends JFrame implements ActionListener {
 		this.add(this.txtABCCode);
 		this.add(this.btnLogin);
 		
+		this.lblUserName.setBounds(100, 50, 180, 30);
 		this.imgNumCode.setBounds(100, 80, 125, 40);
 		this.imgABCCode.setBounds(235, 80, 200, 40);
 		this.txtUserName.setBounds(100, 130, 120, 30);
 		this.txtPassWord.setBounds(100, 170, 120, 30);
 		this.txtNumCode.setBounds(100, 210, 120, 30);
 		this.txtABCCode.setBounds(230, 210, 120, 30);
-		
 		this.btnLogin.setBounds(100, 250, 120, 30);
+		
+		this.imgABCCode.setVisible(false);
+		this.txtABCCode.setVisible(false);
+		
 		this.btnLogin.addActionListener(this);
 	}
 	
@@ -106,7 +116,7 @@ public class MainFrame extends JFrame implements ActionListener {
 			paramMap.put("f", "0");
 			/////////
 			paramMap.put("uname", "32016");
-			paramMap.put("password", "123456a");
+			paramMap.put("password", "123456a1");
 			paramMap.put("numcode", numCode);
 			paramMap.put("verCode", abcCode);
 			paramMap.put("autoLogin", "true");
@@ -117,14 +127,28 @@ public class MainFrame extends JFrame implements ActionListener {
 					.method(Connection.Method.POST)
 					.execute();
 			
-			this.cookiesMap = response.cookies();
 			String htmlContent = response.body();
-			System.out.println(response.statusCode());
+//			System.out.println(htmlContent);
 			Document doc = Jsoup.parse(htmlContent);
 			if ("苏州科技学院网络教学平台".equals(doc.title().trim())) {
 				System.out.println("登录成功");
-				tempRequest(Config.COURSE_PATH);
-			} 
+				this.cookiesMap = response.cookies();
+				tempRequest(Config.COURSE_PAGE);
+			} else {
+				this.imgNumCode.rePaintImage();
+				this.imgABCCode.rePaintImage();
+				if ("密码错误".equals(doc.getElementById("show_error").text().trim())) {
+					System.out.println("密码错误");
+				} else if ("验证码错误".equals(doc.getElementById("show_error").text().trim())) {
+					System.out.println("验证码错误");
+				}
+				//需要输入英文验证码
+				if (htmlContent.indexOf("$(\"#verCode_tr\").removeClass(\"zl_tr_td_hide\");") != -1) {
+					this.imgABCCode.setVisible(true);
+					this.txtABCCode.setVisible(true);
+					System.out.println("验证码错误，需要增加输入字母验证码");
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -137,17 +161,21 @@ public class MainFrame extends JFrame implements ActionListener {
 					.method(Connection.Method.GET)
 					.execute();
 			
-			this.cookiesMap = response.cookies();
 			int statusCode = response.statusCode();
-			System.out.println(statusCode);
 			if (statusCode == 200) {
-				studentWorkRequest(Config.STUDENT_WORK_PATH);
+				this.cookiesMap.putAll(response.cookies());
+				
+				studentWorkRequest(Config.STUDENT_WORK_PAGE);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * 学生作业列表
+	 * @param strUrl
+	 */
 	public void studentWorkRequest(String strUrl) {
 		try {
 			Response response = Jsoup.connect(strUrl)
@@ -155,18 +183,52 @@ public class MainFrame extends JFrame implements ActionListener {
 					.method(Connection.Method.GET)
 					.execute();
 			
-			this.cookiesMap = response.cookies();
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
-			System.out.println(statusCode);
 			if (statusCode == 200) {
+				this.cookiesMap.putAll(response.cookies());
 				System.out.println("学生作业列表");
 				System.out.println(htmlContent);
+				
+				getLoginedUser(Config.USER_INFO_PAGE);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 获取登录用户信息
+	 * @param strUrl
+	 */
+	public void getLoginedUser(String strUrl) {
+		try {
+			Response response = Jsoup.connect(strUrl)
+					.cookies(this.cookiesMap)
+					.method(Connection.Method.GET)
+					.ignoreContentType(true)
+					.execute();
+			
+			String htmlContent = response.body();
+			int statusCode = response.statusCode();
+			if (statusCode == 200) {
+				System.out.println("=====================登录用户信息=======================");
+//				System.out.println(htmlContent);
+				this.cookiesMap.putAll(response.cookies());
+				int keyIndex = htmlContent.indexOf("zt_u_name");
+				htmlContent = htmlContent.substring(keyIndex, keyIndex+24);
+				String userName = htmlContent.substring(11, htmlContent.indexOf("<"));
+				System.out.println(userName);
+				this.lblUserName.setText(this.lblUserName.getText()+"："+userName);
+			}
+		} catch(UnsupportedMimeTypeException e) {
+			System.out.println("UnsupportedMimeTypeException");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 	public static void main(String[] args) {
 		new MainFrame();
@@ -176,6 +238,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String numCode = this.txtNumCode.getText();
 		String abcCode = this.txtABCCode.getText();
+		System.out.println(numCode+"："+abcCode);
 		login(numCode, abcCode);
 	}
 

@@ -20,12 +20,21 @@ public class ImagePanel extends JPanel {
 	private int imgWidth;
 	private int imgHeight;
 	private String strUrl;
+	private String requestHeader;
 	
 	public ImagePanel(int w, int h, String url, String requestHeader) {
 		this.setSize(w, h);
 		this.strUrl = url;
+		this.requestHeader = requestHeader;
+		this.img = initImage();
+		this.setVisible(true);
+//		this.repaint();
+	}
+	
+	private Image initImage() {
+		Image img = null;
 		try {
-			InputStream is = getInputStream(requestHeader);
+			InputStream is = getInputStream(this.requestHeader);
 			BufferedImage bfImg = ImageIO.read(is); 
 			imgWidth = bfImg.getWidth();  
 			imgHeight = bfImg.getHeight();  
@@ -35,8 +44,7 @@ public class ImagePanel extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.setVisible(true);
-		this.repaint();
+		return img;
 	}
 	
 	
@@ -46,7 +54,7 @@ public class ImagePanel extends JPanel {
      * @return
      * @throws IOException
      */
-    public InputStream getInputStream(String header) throws IOException {
+    public InputStream getInputStream(String cookie) throws IOException {
         InputStream inputStream = null;
         HttpURLConnection httpConn = null;
         try {
@@ -58,7 +66,7 @@ public class ImagePanel extends JPanel {
                 httpConn.setDoInput(true);
                 // 设置本次http请求使用get方式请求
                 httpConn.setRequestMethod("GET");
-                httpConn.setRequestProperty("Cookie", header);
+                httpConn.setRequestProperty("Cookie", cookie);
                 int responseCode = httpConn.getResponseCode();
                 if (responseCode == 200) {
                     // 从服务器获得一个输入流
@@ -77,5 +85,14 @@ public class ImagePanel extends JPanel {
 	public void paint(Graphics g) {
 		g.drawImage(img, 0, 0, imgWidth, imgHeight, null);
 	}
+	
+	public void rePaintImage() {
+		this.img = initImage();
+		super.repaint();
+	}
 
 }
+
+
+
+
