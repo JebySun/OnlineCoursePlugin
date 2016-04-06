@@ -1,6 +1,7 @@
 package com.jebysun.onlinecourse.plugin.parser;
 
 public final class Config {
+	
 	public static String LOGIN_PAGE = "http://passport2.usts.edu.cn/login?fid=1944&refer=http://wlkt.usts.edu.cn";
 	
 	public static String LOGIN_ACTION = "http://passport2.usts.edu.cn/login?refer=http%3A%2F%2Fwlkt.usts.edu.cn";

@@ -20,7 +20,10 @@ import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.Connection.Request;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import com.jebysun.onlinecourse.plugin.JavaUtil;
 import com.jebysun.onlinecourse.plugin.parser.Config;
 
 public class MainFrame extends JFrame implements ActionListener {
@@ -187,8 +190,6 @@ public class MainFrame extends JFrame implements ActionListener {
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
 				this.cookiesMap.putAll(response.cookies());
-				System.out.println("学生作业列表");
-				System.out.println(htmlContent);
 				
 				getLoginedUser(Config.USER_INFO_PAGE);
 			}
@@ -213,16 +214,53 @@ public class MainFrame extends JFrame implements ActionListener {
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
 				System.out.println("=====================登录用户信息=======================");
-//				System.out.println(htmlContent);
-				this.cookiesMap.putAll(response.cookies());
+//				this.cookiesMap.putAll(response.cookies());
 				int keyIndex = htmlContent.indexOf("zt_u_name");
 				htmlContent = htmlContent.substring(keyIndex, keyIndex+24);
 				String userName = htmlContent.substring(11, htmlContent.indexOf("<"));
 				System.out.println(userName);
 				this.lblUserName.setText(this.lblUserName.getText()+"："+userName);
+				
+				listStudentWork(Config.WORK_QUERY_URL);
 			}
-		} catch(UnsupportedMimeTypeException e) {
-			System.out.println("UnsupportedMimeTypeException");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void listStudentWork(String strUrl) {
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("workId", "181277");
+		paramMap.put("courseId", "81300811");
+		paramMap.put("pageNum", "1");
+		paramMap.put("classId", "306870");
+		paramMap.put("evaluation", "0");
+		paramMap.put("isdisplaytable", "2");
+		paramMap.put("mooc", "1");
+		paramMap.put("isWork", "true");
+		paramMap.put("tempClassId", "306870");
+		paramMap.put("dengji", "0");
+		paramMap.put("firstHeader", "2");
+		paramMap.put("schoolId", "1944");
+		
+//		JavaUtil.printByEntrySet(this.cookiesMap);
+		try {
+			Response response = Jsoup.connect(strUrl)
+					.cookies(this.cookiesMap)
+					.data(paramMap)
+					.method(Connection.Method.POST)
+					.execute();
+			
+			String htmlContent = response.body();
+			int statusCode = response.statusCode();
+			if (statusCode == 200) {
+				System.out.println("学生作业列表");
+				Element table = Jsoup.parse(htmlContent).getElementById("tableId");
+				Elements trs = table.select("tr");
+				for (Element e : trs) {
+					System.out.println(e.text());
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
