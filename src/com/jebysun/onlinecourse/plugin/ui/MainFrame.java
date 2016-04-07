@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.activation.MimeType;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,8 +15,6 @@ import javax.swing.JTextField;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
-import org.jsoup.Connection.Request;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -260,6 +257,50 @@ public class MainFrame extends JFrame implements ActionListener {
 				for (Element e : trs) {
 					System.out.println(e.text());
 				}
+				//查看学生作业详情
+//				String workDetailUrl = Config.STUDENT_WORK_DETAIL;
+//				workDetailUrl = workDetailUrl.replaceFirst("\\$", "7416190");
+//				System.out.println(workDetailUrl);
+//				studentWorkDetail(workDetailUrl);
+				//查看学生作业详情(已批阅)
+				String workDetailUrl = Config.STUDENT_WORK_COMMENTED_DETAIL;
+				workDetailUrl = workDetailUrl.replaceFirst("\\$", "7053080");
+				studentWorkCommentedDetail(workDetailUrl);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	private void studentWorkDetail(String strUrl) {
+		try {
+			Response response = Jsoup.connect(strUrl)
+					.cookies(this.cookiesMap)
+					.method(Connection.Method.GET)
+					.execute();
+			
+			String htmlContent = response.body();
+			int statusCode = response.statusCode();
+			if (statusCode == 200) {
+				System.out.println(htmlContent);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void studentWorkCommentedDetail(String strUrl) {
+		try {
+			Response response = Jsoup.connect(strUrl)
+					.cookies(this.cookiesMap)
+					.method(Connection.Method.GET)
+					.execute();
+			
+			String htmlContent = response.body();
+			int statusCode = response.statusCode();
+			if (statusCode == 200) {
+				System.out.println(htmlContent);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -18,4 +18,7 @@ public final class Config {
 	
 	public static String USER_INFO_PAGE = "http://www.fanya.usts.edu.cn/passport/allHead.shtml?fid=1944";
 	
+	public static String STUDENT_WORK_DETAIL = "http://mooc1.usts.edu.cn/work/reviewTheContentNew?workId=181277&workAnswerId=$&courseId=81300811&classId=306870&isdisplaytable=2&mooc=1&isWork=true&firstHeader=2&pageNum=1";
+	
+	public static String STUDENT_WORK_COMMENTED_DETAIL = "http://mooc1.usts.edu.cn/work/selectWorkQuestionYiPiYue?courseId=81300811&classId=306870&workId=181277&workAnswerId=$&isdisplaytable=2&mooc=1&isWork=true&firstHeader=2&ut=t&pageNum=3&enc=6c7f8918a09df7ba754aa6ced1708030";
 }
