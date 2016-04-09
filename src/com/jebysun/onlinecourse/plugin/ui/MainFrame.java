@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.activation.MimeType;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,14 +15,11 @@ import javax.swing.JTextField;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
-import org.jsoup.Connection.Request;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.jebysun.onlinecourse.plugin.JavaUtil;
 import com.jebysun.onlinecourse.plugin.parser.Config;
 
 public class MainFrame extends JFrame implements ActionListener {
@@ -43,12 +39,6 @@ public class MainFrame extends JFrame implements ActionListener {
 	public MainFrame() {
 		
 		initView();
-		
-//		try {
-//			HttpUtil.httpGet(Config.LOGIN_PAGE, null, null);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 
 		this.setTitle("登录");
 		this.setBounds(100, 100, 600, 400);
@@ -76,8 +66,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		this.lblUserName = new JLabel("当前登录用户");
 		this.imgNumCode = new ImagePanel(200, 40, Config.NUM_CODE_PATH, cookiesStr);
 		this.imgABCCode = new ImagePanel(200, 40, Config.ABC_CODE_PATH, cookiesStr);
-		this.txtUserName = new JTextField("帐号");
-		this.txtPassWord = new JTextField("密码");
+		this.txtUserName = new JTextField("32016");
+		this.txtPassWord = new JTextField("123456a");
 		this.txtNumCode = new JTextField("数字验证码");
 		this.txtABCCode = new JTextField("字母验证码");
 		this.btnLogin = new JButton("登录");
@@ -107,7 +97,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		this.btnLogin.addActionListener(this);
 	}
 	
-	public void login(String numCode, String abcCode) {
+	public void login(String userName, String passWord, String numCode, String abcCode) {
 		try {
 			Map<String, String> paramMap = new HashMap<String, String>();
 			paramMap.put("pid", "-1");
@@ -117,9 +107,8 @@ public class MainFrame extends JFrame implements ActionListener {
 			paramMap.put("allowJoin", "0");
 			paramMap.put("isCheckNumCode", "1");
 			paramMap.put("f", "0");
-			/////////
-			paramMap.put("uname", "32016");
-			paramMap.put("password", "123456a");
+			paramMap.put("uname", userName);
+			paramMap.put("password", passWord);
 			paramMap.put("numcode", numCode);
 			paramMap.put("verCode", abcCode);
 			paramMap.put("autoLogin", "true");
@@ -260,6 +249,46 @@ public class MainFrame extends JFrame implements ActionListener {
 				for (Element e : trs) {
 					System.out.println(e.text());
 				}
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	//批复学生作业
+	public void commentStudentWork() {
+		//周璐
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("courseId", "81300811");
+		paramMap.put("classId", "306870");
+		paramMap.put("mooc", "1");
+		paramMap.put("isRework", "false");
+		paramMap.put("isWork", "true");
+		paramMap.put("isdisplaytable", "2");
+		paramMap.put("workAnswerId", "7050604");
+		paramMap.put("workId", "181277");
+		paramMap.put("firstHeader", "2");
+		paramMap.put("pageNum", "1");
+		paramMap.put("score", "77");
+		paramMap.put("answerwqbid", "51225694,");
+		paramMap.put("fastPy1", "回答正确");
+		paramMap.put("answer51225694", "机器测试批复一次");
+		
+//		JavaUtil.printByEntrySet(this.cookiesMap);
+		try {
+			Response response = Jsoup.connect(Config.COMMENT_STU_WORK_URL)
+					.cookies(this.cookiesMap)
+					.data(paramMap)
+					.method(Connection.Method.POST)
+					.execute();
+			
+			String htmlContent = response.body();
+			int statusCode = response.statusCode();
+			if (statusCode == 200) {
+				System.out.println("批复成功，下一份");
+				System.out.println(htmlContent);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -274,10 +303,13 @@ public class MainFrame extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		String userName = this.txtUserName.getText();
+		String passWord = this.txtPassWord.getText();
 		String numCode = this.txtNumCode.getText();
 		String abcCode = this.txtABCCode.getText();
+
 		System.out.println(numCode+"："+abcCode);
-		login(numCode, abcCode);
+		login(userName, passWord, numCode, abcCode);
 	}
 
 }
