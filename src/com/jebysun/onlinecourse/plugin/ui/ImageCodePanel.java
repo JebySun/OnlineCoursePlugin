@@ -1,5 +1,6 @@
 package com.jebysun.onlinecourse.plugin.ui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -14,7 +15,7 @@ import javax.swing.JPanel;
 
 import com.jebysun.onlinecourse.plugin.parser.Config;
 
-public class ImagePanel extends JPanel {
+public class ImageCodePanel extends JPanel {
 	private static final long serialVersionUID = 4204888815709087566L;
 	private Image img;
 	private int imgWidth;
@@ -22,13 +23,10 @@ public class ImagePanel extends JPanel {
 	private String strUrl;
 	private String requestHeader;
 	
-	public ImagePanel(int w, int h, String url, String requestHeader) {
-		this.setSize(w, h);
+	public ImageCodePanel(String url, String requestHeader) {
 		this.strUrl = url;
 		this.requestHeader = requestHeader;
 		this.img = initImage();
-		this.setVisible(true);
-//		this.repaint();
 	}
 	
 	private Image initImage() {
@@ -83,7 +81,10 @@ public class ImagePanel extends JPanel {
 	
 	@Override
 	public void paint(Graphics g) {
+		g.clearRect(0, 0, imgWidth, imgHeight);
 		g.drawImage(img, 0, 0, imgWidth, imgHeight, null);
+		g.setColor(Color.gray);
+		g.drawRect(0, 0, imgWidth-1, imgHeight-1);
 	}
 	
 	public void rePaintImage() {

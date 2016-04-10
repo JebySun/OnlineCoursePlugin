@@ -1,4 +1,4 @@
-package com.jebysun.onlinecourse.plugin;
+package com.jebysun.onlinecourse.plugin.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

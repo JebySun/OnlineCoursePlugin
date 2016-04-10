@@ -8,7 +8,7 @@ import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import com.jebysun.onlinecourse.plugin.JavaUtil;
+import com.jebysun.onlinecourse.plugin.util.JavaUtil;
 
 public class WebAPIPicker {
 	
