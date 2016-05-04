@@ -9,8 +9,8 @@ import javax.swing.JFrame;
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 7602027888917954442L;
 	
-	public static final int FRAME_WIDTH = 1000;
-	public static final int FRAME_HEIGHT = 700;
+	public static final int FRAME_WIDTH = 900;
+	public static final int FRAME_HEIGHT = 600;
 	CardLayout cardLayout;
 	LoginPanel loginPanel;
 	StudentWorkListPanel stuWorkPanel;
@@ -34,10 +34,10 @@ public class MainFrame extends JFrame {
 		
 		this.add(loginPanel, "login");
 		this.add(stuWorkPanel, "work_list");
-		this.add(new StudentWorkDetailPanel(this, this.cardLayout), "work_detail");
+//		this.add(new StudentWorkDetailPanel(this, this.cardLayout), "work_detail");
 		
-		this.stuWorkPanel.test();
-		this.cardLayout.show(this.getContentPane(), "work_list");
+//		this.stuWorkPanel.test();
+//		this.cardLayout.show(this.getContentPane(), "work_list");
 
 		this.setVisible(true);
 	}

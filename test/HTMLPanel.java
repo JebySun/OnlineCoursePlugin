@@ -25,7 +25,6 @@ public class HTMLPanel extends JFrame {
 //			editorPane.setPage(path);
 			editorPane.setContentType("text/html; charset=utf-8");
 			String html = getHtmlStringFromFile(filePath);
-			System.out.println(html);
 			editorPane.setText(html);
 		editorPane.setBounds(0, 0, 880, 500);
 		
