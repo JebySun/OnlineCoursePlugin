@@ -15,4 +15,28 @@ public class JavaUtil {
             System.out.println(entry.getKey() + "=" + entry.getValue());  
         }  
     }
+    
+    /**
+     * 去除固定数组尾部的空白元素
+     * @param objArr
+     * @return
+     */
+    public static Object[][] trimArrBlank(Object[][] objArr) {
+    	int length = 0;
+    	for (int i=0; i<objArr.length; i++) {
+    		if (objArr[i][0] == null) {
+    			length = i;
+    			break;
+    		}
+    		length = objArr.length;
+    	}
+    	Object[][] desArr = new Object[length][objArr[0].length];
+    	System.arraycopy(objArr, 0, desArr, 0, length);
+    	return desArr;
+    }
+    
 }
+
+
+
+

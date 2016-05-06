@@ -30,37 +30,43 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.jebysun.onlinecourse.plugin.parser.Config;
+import com.jebysun.onlinecourse.plugin.util.JavaUtil;
 
 public class StudentWorkListPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 4866331079665681296L;
 	private JLabel labLoginedUser;
 	private String[] tableHeader = { "姓名", "学号/帐号", "状态", "提交时间", "IP", "批阅时间", "成绩", "操作"};
-	private Object[][] cellData = new Object[15][9];
+	private Object[][] cellData = new Object[0][0];
 	
 	private JTable table;
 	private JScrollPane scrollPane;
 	private JButton btnNext;
 	private JButton btnPrev;
+	private JLabel labPageInfo;
 	
+	private int pageCount = 3;
 	private int pageIndex = 1;
 
 	public StudentWorkListPanel(Container container, CardLayout cardLayout) {
 		this.setLayout(null);
 		this.labLoginedUser = new JLabel("学生作业列表");
 		this.labLoginedUser.setBounds(0, 0, 200, 30);
-		
 		this.add(labLoginedUser);
 		
-		this.btnNext = new JButton("下一页");
 		this.btnPrev = new JButton("上一页");
-		this.btnNext.setBounds(300, 520, 120, 30);
-		this.btnPrev.setBounds(440, 520, 120, 30);
-		this.btnNext.addActionListener(this);
+		this.btnNext = new JButton("下一页");
+		this.btnPrev.setBounds(320, 520, 100, 30);
+		this.btnNext.setBounds(440, 520, 100, 30);
 		this.btnPrev.addActionListener(this);
-		this.add(btnNext);
+		this.btnNext.addActionListener(this);
 		this.add(btnPrev);
+		this.add(btnNext);
 		
-//		createTable();
+		this.labPageInfo = new JLabel(pageIndex + "/" + pageCount);
+		this.labPageInfo.setBounds(550, 520, 100, 30);
+		this.add(labPageInfo);
+		
+		createTable();
 	}
 
 	public void init() {
@@ -70,9 +76,6 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	public void createTable() {
 		MyTableModel tableModel = new MyTableModel(cellData, tableHeader);
 		table = new JTable(tableModel);
-		
-		table.getColumnModel().getColumn(7).setCellRenderer(new MyButtonCellRender());
-		table.getColumnModel().getColumn(7).setCellEditor(new MyButtonCellEditor(table));
 		
 		// 不可编辑(不推荐)
 //		table.setEnabled(false);
@@ -95,8 +98,8 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	public void updateTableData() {
 		MyTableModel tableModel = new MyTableModel(cellData, tableHeader);
 		table.setModel(tableModel);
-		table.repaint();
-		table.updateUI();
+		table.getColumnModel().getColumn(7).setCellRenderer(new MyButtonCellRender());
+		table.getColumnModel().getColumn(7).setCellEditor(new MyButtonCellEditor(table));
 	}
 
 	/**
@@ -181,6 +184,8 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 				System.out.println("学生作业列表");
 				Element table = Jsoup.parse(htmlContent).getElementById("tableId");
 				Elements trs = table.select("tr");
+				
+				cellData = new Object[15][9];
 				for (int i=0; i<trs.size(); i++) {
 					Element tr = trs.get(i);
 					Elements tds = tr.select("td");
@@ -193,8 +198,9 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 					System.out.println(cellData[i][8]);
 				}
 				
-				createTable();
-//				updateTableData();
+				cellData = JavaUtil.trimArrBlank(cellData);
+	
+				updateTableData();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -211,12 +217,24 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	    return null;
 	}
 	
+	public void listPage(int i) {
+		if (i<1) {
+			pageIndex = 1;
+			return;
+		} else if (i>3) {
+			pageIndex = 3;
+			return;
+		}
+		this.labPageInfo.setText(pageIndex + "/" + pageCount);
+		listStudentWork(i);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == this.btnNext) {
-			listStudentWork(pageIndex++);
+			listPage(++pageIndex);
 		} else if (e.getSource() == this.btnPrev) {
-			listStudentWork(pageIndex--);
+			listPage(--pageIndex);
 		}
 	}
 	
