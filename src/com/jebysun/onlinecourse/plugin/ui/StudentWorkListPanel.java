@@ -31,27 +31,45 @@ import org.jsoup.select.Elements;
 
 import com.jebysun.onlinecourse.plugin.parser.Config;
 
-public class StudentWorkListPanel extends JPanel {
+public class StudentWorkListPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 4866331079665681296L;
 	private JLabel labLoginedUser;
 	private String[] tableHeader = { "姓名", "学号/帐号", "状态", "提交时间", "IP", "批阅时间", "成绩", "操作"};
 	private Object[][] cellData = new Object[15][9];
+	
+	private JTable table;
+	private JScrollPane scrollPane;
+	private JButton btnNext;
+	private JButton btnPrev;
+	
+	private int pageIndex = 1;
 
 	public StudentWorkListPanel(Container container, CardLayout cardLayout) {
 		this.setLayout(null);
-		labLoginedUser = new JLabel("学生作业列表");
-		labLoginedUser.setBounds(0, 0, 200, 30);
+		this.labLoginedUser = new JLabel("学生作业列表");
+		this.labLoginedUser.setBounds(0, 0, 200, 30);
+		
 		this.add(labLoginedUser);
-
+		
+		this.btnNext = new JButton("下一页");
+		this.btnPrev = new JButton("上一页");
+		this.btnNext.setBounds(300, 520, 120, 30);
+		this.btnPrev.setBounds(440, 520, 120, 30);
+		this.btnNext.addActionListener(this);
+		this.btnPrev.addActionListener(this);
+		this.add(btnNext);
+		this.add(btnPrev);
+		
+//		createTable();
 	}
 
 	public void init() {
 		getLoginedUser(Config.USER_INFO_PAGE);
 	}
 	
-	public void createTable(Object[][] cellData) {
+	public void createTable() {
 		MyTableModel tableModel = new MyTableModel(cellData, tableHeader);
-		JTable table = new JTable(tableModel);
+		table = new JTable(tableModel);
 		
 		table.getColumnModel().getColumn(7).setCellRenderer(new MyButtonCellRender());
 		table.getColumnModel().getColumn(7).setCellEditor(new MyButtonCellEditor(table));
@@ -68,12 +86,19 @@ public class StudentWorkListPanel extends JPanel {
 		table.getTableHeader().setPreferredSize(new Dimension(1, 30));
 		// 设置行高
 		table.setRowHeight(30);
-
-		JScrollPane scrollPane = new JScrollPane(table);
+		
+		scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(0, 30, MainFrame.FRAME_WIDTH, MainFrame.FRAME_HEIGHT-30);
 		this.add(scrollPane);
-		scrollPane.setBounds(0, 30, MainFrame.FRAME_WIDTH, MainFrame.FRAME_HEIGHT);
 	}
 	
+	public void updateTableData() {
+		MyTableModel tableModel = new MyTableModel(cellData, tableHeader);
+		table.setModel(tableModel);
+		table.repaint();
+		table.updateUI();
+	}
+
 	/**
 	 * 获取登录用户信息
 	 * @param strUrl
@@ -116,7 +141,7 @@ public class StudentWorkListPanel extends JPanel {
 				MainFrame.getCookiesMap().putAll(response.cookies());
 				
 //				studentWorkRequest(Config.STUDENT_WORK_PAGE);
-				listStudentWork(Config.WORK_QUERY_ACTION);
+				listStudentWork(pageIndex);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -127,11 +152,12 @@ public class StudentWorkListPanel extends JPanel {
 	 * 查询学生作业列表
 	 * @param strUrl
 	 */
-	public void listStudentWork(String strUrl) {
+	public void listStudentWork(int pageIndex) {
+		String strUrl = Config.WORK_QUERY_ACTION;
 		Map<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("workId", "181277");
 		paramMap.put("courseId", "81300811");
-		paramMap.put("pageNum", "2");
+		paramMap.put("pageNum", String.valueOf(pageIndex));
 		paramMap.put("classId", "306870");
 		paramMap.put("evaluation", "0");
 		paramMap.put("isdisplaytable", "2");
@@ -167,7 +193,8 @@ public class StudentWorkListPanel extends JPanel {
 					System.out.println(cellData[i][8]);
 				}
 				
-				createTable(cellData);
+				createTable();
+//				updateTableData();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -182,6 +209,15 @@ public class StudentWorkListPanel extends JPanel {
 	       return m.group(1);  
 	    }
 	    return null;
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == this.btnNext) {
+			listStudentWork(pageIndex++);
+		} else if (e.getSource() == this.btnPrev) {
+			listStudentWork(pageIndex--);
+		}
 	}
 	
 	
@@ -346,6 +382,8 @@ public class StudentWorkListPanel extends JPanel {
 		}
 		
 	}
+
+
 	
 	
 

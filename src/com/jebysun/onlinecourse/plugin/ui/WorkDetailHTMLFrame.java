@@ -30,7 +30,7 @@ public class WorkDetailHTMLFrame extends JFrame {
 	private void createHTMLPanel(String infoHTML) {
 		
 		JEditorPane editorPane = new JEditorPane();
-		editorPane.setEditable(false); //请把editorPane设置为只读，不然显示就不整齐 
+		editorPane.setEditable(false); //editorPane设置为只读，不然显示就不整齐 
 		editorPane.setContentType("text/html; charset=utf-8");
 		String fullHTML = buildHtmlString(infoHTML);
 		editorPane.setText(fullHTML);
