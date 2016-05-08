@@ -27,6 +27,8 @@ public final class Config {
 	public static String STUDENT_WORK_COMMENTED_DETAIL = "http://mooc1.usts.edu.cn/work/selectWorkQuestionYiPiYue?courseId=81300811&classId=306870&workId=181277&workAnswerId=$&isdisplaytable=2&mooc=1&isWork=true&firstHeader=2&ut=t&pageNum=$&enc=6c7f8918a09df7ba754aa6ced1708030";
 	//批复学生作业动作执行URL
 	public static String COMMENT_STU_WORK_ACTION = "http://mooc1.usts.edu.cn/work/saveReviewTheContentNew";
+	//导出学生成绩xls文件
+	public static String EXPORT_STU_SCORE = "http://mooc1.usts.edu.cn/work/exportScore?courseId=$&classId=$&workId=$&mooc=$";
 	
 	
 }

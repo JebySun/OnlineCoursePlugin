@@ -54,7 +54,7 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 	
 	public WorkDetailHTMLFrame(String title, String workDetailUrl, boolean isCommented) {
 		this.setTitle(title);
-		this.setBounds(0, 0,  MainFrame.FRAME_WIDTH, MainFrame.FRAME_HEIGHT);
+		this.setBounds(40, 40,  MainFrame.FRAME_WIDTH, MainFrame.FRAME_HEIGHT);
 		this.setResizable(false);
 		this.setLayout(null);
 		

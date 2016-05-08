@@ -22,7 +22,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void intiWindow() {
-		this.setTitle("苏州科技大学学生作业批改程序");
+		this.setTitle("苏州科技大学学生作业批改程序v1.0.0");
 		this.setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);

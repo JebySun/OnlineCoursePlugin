@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.lang.model.element.PackageElement;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -27,6 +26,7 @@ import javax.swing.table.TableCellRenderer;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.Connection.Response;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -41,9 +41,15 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	
 	private JTable table;
 	private JScrollPane scrollPane;
+	private JButton btnExportScore;
 	private JButton btnNext;
 	private JButton btnPrev;
 	private JLabel labPageInfo;
+	
+	private String courseId;
+	private String classId;
+	private String workId;
+	private String mooc;
 	
 	private int pageCount = 3;
 	private int pageIndex = 1;
@@ -54,12 +60,16 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		this.labLoginedUser.setBounds(MainFrame.FRAME_WIDTH-140, 0, 140, 30);
 		this.add(labLoginedUser);
 		
+		this.btnExportScore = new JButton("导出成绩xls文件");
 		this.btnPrev = new JButton("上一页");
 		this.btnNext = new JButton("下一页");
+		this.btnExportScore.setBounds(10, MainFrame.FRAME_HEIGHT-80, 140, 30);
 		this.btnPrev.setBounds(320, MainFrame.FRAME_HEIGHT-80, 100, 30);
 		this.btnNext.setBounds(440, MainFrame.FRAME_HEIGHT-80, 100, 30);
+		this.btnExportScore.addActionListener(this);
 		this.btnPrev.addActionListener(this);
 		this.btnNext.addActionListener(this);
+		this.add(btnExportScore);
 		this.add(btnPrev);
 		this.add(btnNext);
 		
@@ -182,8 +192,14 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
-				System.out.println("学生作业列表");
-				Element table = Jsoup.parse(htmlContent).getElementById("tableId");
+				Document doc = Jsoup.parse(htmlContent);
+				
+				this.classId = doc.getElementById("classId").val();
+				this.courseId = doc.getElementById("courseId").val();
+				this.workId = doc.getElementById("workId").val();
+				this.mooc = doc.getElementById("mooc").val();
+				
+				Element table = doc.getElementById("tableId");
 				Elements trs = table.select("tr");
 				
 				cellData = new Object[15][9];
@@ -200,7 +216,6 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 				}
 				
 				cellData = JavaUtil.trimArrBlank(cellData);
-	
 				updateTableData();
 			}
 		} catch (IOException e) {
@@ -231,16 +246,31 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		listStudentWork(i);
 	}
 	
+	private void exportScoreInXLS() {
+		String url = Config.EXPORT_STU_SCORE;
+		url = url.replaceFirst("\\$", courseId);
+		url = url.replaceFirst("\\$", classId);
+		url = url.replaceFirst("\\$", workId);
+		url = url.replaceFirst("\\$", mooc);
+		//根据文件URL下载文件
+		//...
+		System.out.println(url);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == this.btnNext) {
 			listPage(++pageIndex);
 		} else if (e.getSource() == this.btnPrev) {
 			listPage(--pageIndex);
+		} else if (e.getSource() == this.btnExportScore) {
+			exportScoreInXLS();
 		}
 	}
 	
 	
+	
+	/////////////////////////////////////////////////////////////
 	
 	/**
 	 * 表格模式
