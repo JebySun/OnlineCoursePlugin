@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.lang.model.element.PackageElement;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -50,20 +51,20 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	public StudentWorkListPanel(Container container, CardLayout cardLayout) {
 		this.setLayout(null);
 		this.labLoginedUser = new JLabel("学生作业列表");
-		this.labLoginedUser.setBounds(0, 0, 200, 30);
+		this.labLoginedUser.setBounds(MainFrame.FRAME_WIDTH-140, 0, 140, 30);
 		this.add(labLoginedUser);
 		
 		this.btnPrev = new JButton("上一页");
 		this.btnNext = new JButton("下一页");
-		this.btnPrev.setBounds(320, 520, 100, 30);
-		this.btnNext.setBounds(440, 520, 100, 30);
+		this.btnPrev.setBounds(320, MainFrame.FRAME_HEIGHT-80, 100, 30);
+		this.btnNext.setBounds(440, MainFrame.FRAME_HEIGHT-80, 100, 30);
 		this.btnPrev.addActionListener(this);
 		this.btnNext.addActionListener(this);
 		this.add(btnPrev);
 		this.add(btnNext);
 		
 		this.labPageInfo = new JLabel(pageIndex + "/" + pageCount);
-		this.labPageInfo.setBounds(550, 520, 100, 30);
+		this.labPageInfo.setBounds(550, MainFrame.FRAME_HEIGHT-80, 100, 30);
 		this.add(labPageInfo);
 		
 		createTable();
@@ -155,7 +156,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	 * 查询学生作业列表
 	 * @param strUrl
 	 */
-	public void listStudentWork(int pageIndex) {
+	private void listStudentWork(int pageIndex) {
 		String strUrl = Config.WORK_QUERY_ACTION;
 		Map<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("workId", "181277");
@@ -225,6 +226,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 			pageIndex = 3;
 			return;
 		}
+		this.pageIndex = i;
 		this.labPageInfo.setText(pageIndex + "/" + pageCount);
 		listStudentWork(i);
 	}
@@ -361,10 +363,10 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 					boolean isCommented = false;
 					if (score.trim().equals("")) {
 						//查看学生作业(未批阅)详情
-						workDetailUrl = Config.STUDENT_WORK_DETAIL.replaceFirst("\\$", stuWorkId);
+						workDetailUrl = Config.STUDENT_WORK_DETAIL.replaceFirst("\\$", stuWorkId).replaceFirst("\\$", String.valueOf(pageIndex));
 					} else {
 						//查看学生作业(已批阅)详情
-						workDetailUrl = Config.STUDENT_WORK_COMMENTED_DETAIL.replaceFirst("\\$", stuWorkId);
+						workDetailUrl = Config.STUDENT_WORK_COMMENTED_DETAIL.replaceFirst("\\$", stuWorkId).replaceFirst("\\$", String.valueOf(pageIndex));
 						isCommented = true;
 					}
 					new WorkDetailHTMLFrame(title, workDetailUrl, isCommented);

@@ -11,9 +11,9 @@ public class MainFrame extends JFrame {
 	
 	public static final int FRAME_WIDTH = 900;
 	public static final int FRAME_HEIGHT = 600;
-	CardLayout cardLayout;
-	LoginPanel loginPanel;
-	StudentWorkListPanel stuWorkPanel;
+	public CardLayout cardLayout;
+	public static LoginPanel loginPanel;
+	public static StudentWorkListPanel stuWorkListPanel;
 	
 	private static Map<String, String> cookiesMap = new HashMap<String, String>();
 	
@@ -29,16 +29,12 @@ public class MainFrame extends JFrame {
 		this.cardLayout = new CardLayout();
 		this.setLayout(this.cardLayout);
 		
-		this.loginPanel = new LoginPanel(this, this.cardLayout);
-		this.stuWorkPanel = new StudentWorkListPanel(this, this.cardLayout);
+		loginPanel = new LoginPanel(this, this.cardLayout);
+		stuWorkListPanel = new StudentWorkListPanel(this, this.cardLayout);
 		
 		this.add(loginPanel, "login");
-		this.add(stuWorkPanel, "work_list");
-//		this.add(new StudentWorkDetailPanel(this, this.cardLayout), "work_detail");
+		this.add(stuWorkListPanel, "work_list");
 		
-//		this.stuWorkPanel.test();
-//		this.cardLayout.show(this.getContentPane(), "work_list");
-
 		this.setVisible(true);
 	}
 

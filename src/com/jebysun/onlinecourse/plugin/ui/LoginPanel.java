@@ -174,7 +174,7 @@ public class LoginPanel extends JPanel implements ActionListener {
 			if ("苏州科技学院网络教学平台".equals(doc.title().trim())) {
 				MainFrame.setCookiesMap(response.cookies());
 				//显示学生作业面板
-				this.frameContainer.stuWorkPanel.init();
+				this.frameContainer.stuWorkListPanel.init();
 				this.cardLayout.show(this.frameContainer.getContentPane(), "work_list");
 			} else {
 				this.imgNumCode.rePaintImage();
