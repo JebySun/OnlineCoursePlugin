@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import org.jsoup.Connection;
@@ -51,7 +52,7 @@ public class LoginPanel extends JPanel implements ActionListener {
 	private ImageCodePanel imgNumCode;
 	private ImageCodePanel imgABCCode;
 	private JTextField txtUserName;
-	private JTextField txtPassWord;
+	private JPasswordField txtPassWord;
 	private JTextField txtNumCode;
 	private JTextField txtABCCode;
 	private JButton btnLogin;
@@ -101,7 +102,7 @@ public class LoginPanel extends JPanel implements ActionListener {
 		this.imgNumCode = new ImageCodePanel(Config.NUM_CODE_PATH, cookiesStr);
 		this.imgABCCode = new ImageCodePanel(Config.ABC_CODE_PATH, cookiesStr);
 		this.txtUserName = new JTextField("32016");
-		this.txtPassWord = new JTextField("123456a");
+		this.txtPassWord = new JPasswordField();
 		this.txtNumCode = new JTextField();
 		this.txtABCCode = new JTextField();
 		this.btnLogin = new JButton("登  录");
