@@ -153,7 +153,6 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
-				System.out.println(htmlContent);
 				Document doc = Jsoup.parse(htmlContent);
 //				doc.select(".TiMu .fl").get(0).remove();
 				
@@ -234,7 +233,6 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
-				System.out.println("==================批复成功，下一份==================");
 				//回调刷新列表
 				MainFrame.stuWorkListPanel.listPage(Integer.parseInt(this.pageNum));
 			}

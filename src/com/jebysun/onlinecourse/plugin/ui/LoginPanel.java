@@ -169,7 +169,6 @@ public class LoginPanel extends JPanel implements ActionListener {
 					.execute();
 			
 			String htmlContent = response.body();
-			System.out.println(htmlContent);
 			Document doc = Jsoup.parse(htmlContent);
 			if ("苏州科技学院网络教学平台".equals(doc.title().trim())) {
 				MainFrame.setCookiesMap(response.cookies());
@@ -189,7 +188,6 @@ public class LoginPanel extends JPanel implements ActionListener {
 				if (htmlContent.indexOf("$(\"#verCode_tr\").removeClass(\"zl_tr_td_hide\");") != -1) {
 					this.imgABCCode.setVisible(true);
 					this.txtABCCode.setVisible(true);
-					System.out.println("需要增加输入字母验证码");
 				}
 			}
 		} catch (IOException e) {

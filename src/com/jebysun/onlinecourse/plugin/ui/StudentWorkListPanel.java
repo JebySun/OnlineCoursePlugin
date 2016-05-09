@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +16,14 @@ import java.util.regex.Pattern;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -128,13 +133,10 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
-				System.out.println("=====================登录用户信息=======================");
 				int keyIndex = htmlContent.indexOf("zt_u_name");
 				htmlContent = htmlContent.substring(keyIndex, keyIndex+24);
 				String userName = htmlContent.substring(11, htmlContent.indexOf("<"));
-				System.out.println(userName);
 				labLoginedUser.setText("当前登录账户："+userName);
-				
 				tempRequest(Config.COURSE_PAGE);
 			}
 		} catch (IOException e) {
@@ -153,14 +155,42 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
 				MainFrame.getCookiesMap().putAll(response.cookies());
+				studentWorkRequest(Config.STUDENT_WORK_PAGE);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * 学生作业列表页面（实际查询不到数据）
+	 * @param strUrl
+	 */
+	public void studentWorkRequest(String strUrl) {
+		try {
+			Response response = Jsoup.connect(strUrl)
+					.cookies(MainFrame.getCookiesMap())
+					.method(Connection.Method.GET)
+					.execute();
+			
+			String htmlContent = response.body();
+			int statusCode = response.statusCode();
+			if (statusCode == 200) {
+				MainFrame.getCookiesMap().putAll(response.cookies());
+				Document doc = Jsoup.parse(htmlContent);
+				this.classId = doc.getElementById("classId").val();
+				this.courseId = doc.getElementById("courseId").val();
+				this.workId = doc.getElementById("workId").val();
+				this.mooc = doc.getElementById("mooc").val();
 				
-//				studentWorkRequest(Config.STUDENT_WORK_PAGE);
 				listStudentWork(pageIndex);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	/**
 	 * 查询学生作业列表
@@ -193,26 +223,17 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
 				Document doc = Jsoup.parse(htmlContent);
-				
-				this.classId = doc.getElementById("classId").val();
-				this.courseId = doc.getElementById("courseId").val();
-				this.workId = doc.getElementById("workId").val();
-				this.mooc = doc.getElementById("mooc").val();
-				
 				Element table = doc.getElementById("tableId");
 				Elements trs = table.select("tr");
-				
 				cellData = new Object[15][9];
 				for (int i=0; i<trs.size(); i++) {
 					Element tr = trs.get(i);
 					Elements tds = tr.select("td");
 					for (int k=0; k<tds.size(); k++) {
-						System.out.print(tds.get(k).text()+"\t");
 						cellData[i][k] = tds.get(k).text();
 					}
 					String tempUrl = tds.get(7).getElementsByTag("a").attr("onclick");
 					cellData[i][8] = getParmValue(tempUrl, "workAnswerId");
-					System.out.println(cellData[i][8]);
 				}
 				
 				cellData = JavaUtil.trimArrBlank(cellData);
@@ -252,10 +273,45 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		url = url.replaceFirst("\\$", classId);
 		url = url.replaceFirst("\\$", workId);
 		url = url.replaceFirst("\\$", mooc);
-		//根据文件URL下载文件
-		//...
-		System.out.println(url);
+		
+		JFileChooser fileChooser = new JFileChooser();
+		FileSystemView fsv = FileSystemView.getFileSystemView();
+		fileChooser.setCurrentDirectory(fsv.getHomeDirectory());
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setDialogTitle("请文件保存路径");
+		fileChooser.setApproveButtonText("保存");
+		FileNameExtensionFilter fileNameFilter = new FileNameExtensionFilter("xls表格文件", "xls", "XLS");
+		fileChooser.setFileFilter(fileNameFilter);
+    	int returnVal = fileChooser.showOpenDialog(fileChooser);
+    	if (JFileChooser.APPROVE_OPTION == returnVal) {
+    		String filepath = fileChooser.getSelectedFile().getAbsolutePath();
+    		if (!filepath.endsWith(".xls") && !filepath.endsWith(".XLS")) {
+    			filepath += ".xls";
+    		}
+    		//根据文件URL下载文件
+    		fileDownload(url, filepath);
+    	}
+		
 	}
+	
+	private void fileDownload(String fileUrl, String fileLocation) {
+		Response response = null;
+		try {
+			response = Jsoup.connect(fileUrl)
+					.cookies(MainFrame.getCookiesMap())
+					.ignoreContentType(true)
+					.method(Connection.Method.GET)
+					.execute();
+			
+			byte[] file = response.bodyAsBytes();
+			FileOutputStream out = (new FileOutputStream(new File(fileLocation)));
+			out.write(file);           
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
