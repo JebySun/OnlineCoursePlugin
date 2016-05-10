@@ -233,6 +233,8 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
+				//关闭窗口
+				this.dispose();
 				//回调刷新列表
 				MainFrame.stuWorkListPanel.listPage(Integer.parseInt(this.pageNum));
 			}
