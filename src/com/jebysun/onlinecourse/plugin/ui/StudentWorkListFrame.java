@@ -1,8 +1,6 @@
 package com.jebysun.onlinecourse.plugin.ui;
 
-import java.awt.CardLayout;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +15,7 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,10 +34,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.jebysun.onlinecourse.plugin.parser.Config;
+import com.jebysun.onlinecourse.plugin.ApplicationContext;
 import com.jebysun.onlinecourse.plugin.util.JavaUtil;
 
-public class StudentWorkListPanel extends JPanel implements ActionListener {
+public class StudentWorkListFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 4866331079665681296L;
 	private JLabel labLoginedUser;
 	private String[] tableHeader = { "姓名", "学号/帐号", "状态", "提交时间", "IP", "批阅时间", "成绩", "操作"};
@@ -59,18 +58,18 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	private int pageCount = 3;
 	private int pageIndex = 1;
 
-	public StudentWorkListPanel(Container container, CardLayout cardLayout) {
+	public StudentWorkListFrame() {
 		this.setLayout(null);
 		this.labLoginedUser = new JLabel("学生作业列表");
-		this.labLoginedUser.setBounds(MainFrame.FRAME_WIDTH-140, 0, 140, 30);
+		this.labLoginedUser.setBounds(ApplicationContext.FRAME_WIDTH-140, 0, 140, 30);
 		this.add(labLoginedUser);
 		
 		this.btnExportScore = new JButton("导出成绩xls文件");
 		this.btnPrev = new JButton("上一页");
 		this.btnNext = new JButton("下一页");
-		this.btnExportScore.setBounds(10, MainFrame.FRAME_HEIGHT-80, 140, 30);
-		this.btnPrev.setBounds(320, MainFrame.FRAME_HEIGHT-80, 100, 30);
-		this.btnNext.setBounds(440, MainFrame.FRAME_HEIGHT-80, 100, 30);
+		this.btnExportScore.setBounds(10, ApplicationContext.FRAME_HEIGHT-80, 140, 30);
+		this.btnPrev.setBounds(320, ApplicationContext.FRAME_HEIGHT-80, 100, 30);
+		this.btnNext.setBounds(440, ApplicationContext.FRAME_HEIGHT-80, 100, 30);
 		this.btnExportScore.addActionListener(this);
 		this.btnPrev.addActionListener(this);
 		this.btnNext.addActionListener(this);
@@ -79,14 +78,21 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		this.add(btnNext);
 		
 		this.labPageInfo = new JLabel(pageIndex + "/" + pageCount);
-		this.labPageInfo.setBounds(550, MainFrame.FRAME_HEIGHT-80, 100, 30);
+		this.labPageInfo.setBounds(550, ApplicationContext.FRAME_HEIGHT-80, 100, 30);
 		this.add(labPageInfo);
-		
+
 		createTable();
+		init();
+		
+		this.setTitle(ApplicationContext.FRAME_TITLE+"v"+ApplicationContext.VERSION);
+		this.setBounds(0, 0, ApplicationContext.FRAME_WIDTH, ApplicationContext.FRAME_HEIGHT);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setResizable(false);
+		this.setVisible(true);
 	}
 
 	public void init() {
-		getLoginedUser(Config.USER_INFO_PAGE);
+		getLoginedUser(ApplicationContext.USER_INFO_PAGE);
 	}
 	
 	public void createTable() {
@@ -107,7 +113,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		table.setRowHeight(30);
 		
 		scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(0, 30, MainFrame.FRAME_WIDTH, MainFrame.FRAME_HEIGHT-30);
+		scrollPane.setBounds(0, 30, ApplicationContext.FRAME_WIDTH, ApplicationContext.FRAME_HEIGHT-30);
 		this.add(scrollPane);
 	}
 	
@@ -125,7 +131,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	public void getLoginedUser(String strUrl) {
 		try {
 			Response response = Jsoup.connect(strUrl)
-					.cookies(MainFrame.getCookiesMap())
+					.cookies(ApplicationContext.getCookiesMap())
 					.method(Connection.Method.GET)
 					.ignoreContentType(true)
 					.execute();
@@ -137,7 +143,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 				htmlContent = htmlContent.substring(keyIndex, keyIndex+24);
 				String userName = htmlContent.substring(11, htmlContent.indexOf("<"));
 				labLoginedUser.setText("当前登录账户："+userName);
-				tempRequest(Config.COURSE_PAGE);
+				tempRequest(ApplicationContext.COURSE_PAGE);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -148,14 +154,14 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	public void tempRequest(String strUrl) {
 		try {
 			Response response = Jsoup.connect(strUrl)
-					.cookies(MainFrame.getCookiesMap())
+					.cookies(ApplicationContext.getCookiesMap())
 					.method(Connection.Method.GET)
 					.execute();
 			
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
-				MainFrame.getCookiesMap().putAll(response.cookies());
-				studentWorkRequest(Config.STUDENT_WORK_PAGE);
+				ApplicationContext.getCookiesMap().putAll(response.cookies());
+				studentWorkRequest(ApplicationContext.STUDENT_WORK_PAGE);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -170,14 +176,14 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	public void studentWorkRequest(String strUrl) {
 		try {
 			Response response = Jsoup.connect(strUrl)
-					.cookies(MainFrame.getCookiesMap())
+					.cookies(ApplicationContext.getCookiesMap())
 					.method(Connection.Method.GET)
 					.execute();
 			
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
-				MainFrame.getCookiesMap().putAll(response.cookies());
+				ApplicationContext.getCookiesMap().putAll(response.cookies());
 				Document doc = Jsoup.parse(htmlContent);
 				this.classId = doc.getElementById("classId").val();
 				this.courseId = doc.getElementById("courseId").val();
@@ -197,7 +203,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	 * @param strUrl
 	 */
 	private void listStudentWork(int pageIndex) {
-		String strUrl = Config.WORK_QUERY_ACTION;
+		String strUrl = ApplicationContext.WORK_QUERY_ACTION;
 		Map<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("workId", "181277");
 		paramMap.put("courseId", "81300811");
@@ -214,7 +220,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		
 		try {
 			Response response = Jsoup.connect(strUrl)
-					.cookies(MainFrame.getCookiesMap())
+					.cookies(ApplicationContext.getCookiesMap())
 					.data(paramMap)
 					.method(Connection.Method.POST)
 					.execute();
@@ -268,7 +274,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 	}
 	
 	private void exportScoreInXLS() {
-		String url = Config.EXPORT_STU_SCORE;
+		String url = ApplicationContext.EXPORT_STU_SCORE;
 		url = url.replaceFirst("\\$", courseId);
 		url = url.replaceFirst("\\$", classId);
 		url = url.replaceFirst("\\$", workId);
@@ -298,7 +304,7 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 		Response response = null;
 		try {
 			response = Jsoup.connect(fileUrl)
-					.cookies(MainFrame.getCookiesMap())
+					.cookies(ApplicationContext.getCookiesMap())
 					.ignoreContentType(true)
 					.method(Connection.Method.GET)
 					.execute();
@@ -449,10 +455,10 @@ public class StudentWorkListPanel extends JPanel implements ActionListener {
 					boolean isCommented = false;
 					if (score.trim().equals("")) {
 						//查看学生作业(未批阅)详情
-						workDetailUrl = Config.STUDENT_WORK_DETAIL.replaceFirst("\\$", stuWorkId).replaceFirst("\\$", String.valueOf(pageIndex));
+						workDetailUrl = ApplicationContext.STUDENT_WORK_DETAIL.replaceFirst("\\$", stuWorkId).replaceFirst("\\$", String.valueOf(pageIndex));
 					} else {
 						//查看学生作业(已批阅)详情
-						workDetailUrl = Config.STUDENT_WORK_COMMENTED_DETAIL.replaceFirst("\\$", stuWorkId).replaceFirst("\\$", String.valueOf(pageIndex));
+						workDetailUrl = ApplicationContext.STUDENT_WORK_COMMENTED_DETAIL.replaceFirst("\\$", stuWorkId).replaceFirst("\\$", String.valueOf(pageIndex));
 						isCommented = true;
 					}
 					new WorkDetailHTMLFrame(title, workDetailUrl, isCommented);

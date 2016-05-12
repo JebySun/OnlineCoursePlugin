@@ -1,12 +1,16 @@
 package com.jebysun.onlinecourse.plugin;
 
-import com.jebysun.onlinecourse.plugin.ui.MainFrame;
-
+import com.jebysun.onlinecourse.plugin.ui.LoginFrame;
+/**
+ * 程序执行入口
+ * @author JebySun
+ *
+ */
 public class Main {
 	
 	public static void main(String[] args) {
-		
-		new MainFrame();
+		//创建登录窗口
+		new LoginFrame();
 
 	}
 

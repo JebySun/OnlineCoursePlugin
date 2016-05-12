@@ -13,8 +13,6 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import com.jebysun.onlinecourse.plugin.parser.Config;
-
 public class ImageCodePanel extends JPanel {
 	private static final long serialVersionUID = 4204888815709087566L;
 	private Image img;

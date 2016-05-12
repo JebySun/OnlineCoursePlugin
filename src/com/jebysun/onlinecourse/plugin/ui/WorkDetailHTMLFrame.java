@@ -21,7 +21,7 @@ import org.jsoup.Connection.Response;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 
-import com.jebysun.onlinecourse.plugin.parser.Config;
+import com.jebysun.onlinecourse.plugin.ApplicationContext;
 
 /**
  * 学生作业详情
@@ -54,7 +54,7 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 	
 	public WorkDetailHTMLFrame(String title, String workDetailUrl, boolean isCommented) {
 		this.setTitle(title);
-		this.setBounds(40, 40,  MainFrame.FRAME_WIDTH, MainFrame.FRAME_HEIGHT);
+		this.setBounds(40, 40,  ApplicationContext.FRAME_WIDTH, ApplicationContext.FRAME_HEIGHT);
 		this.setResizable(false);
 		this.setLayout(null);
 		
@@ -70,9 +70,9 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 		this.add(this.jRbtnOK);
 		this.add(this.jRbtnError);
 		this.add(this.jRbtnSoso);
-		this.jRbtnOK.setBounds(10, MainFrame.FRAME_HEIGHT-60, 80, 30);
-		this.jRbtnError.setBounds(100, MainFrame.FRAME_HEIGHT-60, 80, 30);
-		this.jRbtnSoso.setBounds(190, MainFrame.FRAME_HEIGHT-60, 110, 30);
+		this.jRbtnOK.setBounds(10, ApplicationContext.FRAME_HEIGHT-60, 80, 30);
+		this.jRbtnError.setBounds(100, ApplicationContext.FRAME_HEIGHT-60, 80, 30);
+		this.jRbtnSoso.setBounds(190, ApplicationContext.FRAME_HEIGHT-60, 110, 30);
 		ButtonGroup commentBtnGroup = new ButtonGroup();
 		commentBtnGroup.add(this.jRbtnOK);
 		commentBtnGroup.add(this.jRbtnError);
@@ -83,24 +83,24 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 
 		JLabel scoreLabel = new JLabel("分数");
 		this.add(scoreLabel);
-		scoreLabel.setBounds(310, MainFrame.FRAME_HEIGHT-60, 40, 30);
+		scoreLabel.setBounds(310, ApplicationContext.FRAME_HEIGHT-60, 40, 30);
 		
 		this.jTxtScore = new JTextField();
 		this.add(this.jTxtScore);
-		this.jTxtScore.setBounds(340,  MainFrame.FRAME_HEIGHT-60, 60, 30);
+		this.jTxtScore.setBounds(340,  ApplicationContext.FRAME_HEIGHT-60, 60, 30);
 		
 		
 		JLabel labelScore = new JLabel("评语");
 		this.add(labelScore);
-		labelScore.setBounds(420, MainFrame.FRAME_HEIGHT-60, 40, 30);
+		labelScore.setBounds(420, ApplicationContext.FRAME_HEIGHT-60, 40, 30);
 		
 		this.jTxtComment = new JTextField();
 		this.add(this.jTxtComment);
-		this.jTxtComment.setBounds(450,  MainFrame.FRAME_HEIGHT-60, 380, 30);
+		this.jTxtComment.setBounds(450,  ApplicationContext.FRAME_HEIGHT-60, 380, 30);
 		
 		this.btnSubmit = new JButton("提交");
 		this.add(this.btnSubmit);
-		this.btnSubmit.setBounds(830,  MainFrame.FRAME_HEIGHT-60, 60, 30);
+		this.btnSubmit.setBounds(830,  ApplicationContext.FRAME_HEIGHT-60, 60, 30);
 		this.btnSubmit.addActionListener(this);
 	}
 	
@@ -112,11 +112,11 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 	private void initCommentedView(String score, String comment) {
 		JLabel scoreLabel = new JLabel("分数："+score);
 		this.add(scoreLabel);
-		scoreLabel.setBounds(10, MainFrame.FRAME_HEIGHT-60, 80, 30);
+		scoreLabel.setBounds(10, ApplicationContext.FRAME_HEIGHT-60, 80, 30);
 		
 		JLabel commentLabel = new JLabel("评语："+comment);
 		this.add(commentLabel);
-		commentLabel.setBounds(100, MainFrame.FRAME_HEIGHT-60, 790, 30);
+		commentLabel.setBounds(100, ApplicationContext.FRAME_HEIGHT-60, 790, 30);
 	}
 	
 	private void createHTMLPanel(String infoHTML, String score, String comment) {
@@ -127,7 +127,7 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 		String fullHTML = buildHtmlString(infoHTML);
 		editorPane.setText(fullHTML);
 		JScrollPane jscrollPane = new JScrollPane(editorPane);
-		jscrollPane.setBounds(0, 0, MainFrame.FRAME_WIDTH-4, MainFrame.FRAME_HEIGHT-60);
+		jscrollPane.setBounds(0, 0, ApplicationContext.FRAME_WIDTH-4, ApplicationContext.FRAME_HEIGHT-60);
 		this.add(jscrollPane);
 		
 		if (isCommented) {
@@ -145,11 +145,11 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 	private void studentWorkDetail(String strUrl) {
 		try {
 			Response response = Jsoup.connect(strUrl)
-					.cookies(MainFrame.getCookiesMap())
+					.cookies(ApplicationContext.getCookiesMap())
 					.method(Connection.Method.GET)
 					.execute();
 			
-			MainFrame.getCookiesMap().putAll(response.cookies());
+			ApplicationContext.getCookiesMap().putAll(response.cookies());
 			String htmlContent = response.body();
 			int statusCode = response.statusCode();
 			if (statusCode == 200) {
@@ -224,8 +224,8 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 
 //		paramMap.put("score54001435", "55");
 		try {
-			Response response = Jsoup.connect(Config.COMMENT_STU_WORK_ACTION)
-					.cookies(MainFrame.getCookiesMap())
+			Response response = Jsoup.connect(ApplicationContext.COMMENT_STU_WORK_ACTION)
+					.cookies(ApplicationContext.getCookiesMap())
 					.data(paramMap)
 					.method(Connection.Method.POST)
 					.execute();
@@ -235,8 +235,8 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 			if (statusCode == 200) {
 				//关闭窗口
 				this.dispose();
-				//回调刷新列表
-				MainFrame.stuWorkListPanel.listPage(Integer.parseInt(this.pageNum));
+				//刷新列表
+				ApplicationContext.getWorkListFrame().listPage(Integer.parseInt(this.pageNum));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

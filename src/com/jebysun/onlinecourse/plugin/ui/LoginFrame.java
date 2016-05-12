@@ -1,6 +1,5 @@
 package com.jebysun.onlinecourse.plugin.ui;
 
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -14,6 +13,7 @@ import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,18 +25,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 
-import com.jebysun.onlinecourse.plugin.parser.Config;
+import com.jebysun.onlinecourse.plugin.ApplicationContext;
 
 /**
  * 登录面板
  * @author JebySun
  *
  */
-public class LoginPanel extends JPanel implements ActionListener {
+public class LoginFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -2792638911561146803L;
-	
-	MainFrame frameContainer;
-	CardLayout cardLayout;
 	
 	private JPanel containerPanel;
 	
@@ -57,15 +54,13 @@ public class LoginPanel extends JPanel implements ActionListener {
 	private JTextField txtABCCode;
 	private JButton btnLogin;
 	
-	public LoginPanel(MainFrame frameContainer, CardLayout cardLayout) {
-		this.frameContainer = frameContainer;
-		this.cardLayout = cardLayout;
+	public LoginFrame() {
 		containerPanel = new JPanel();
 		
 		containerPanel.setBackground(new Color(0xFFFFFF));
 		containerPanel.setBorder(BorderFactory.createLineBorder(new Color(0x999999)));
 		this.setLayout(null);
-		containerPanel.setBounds((MainFrame.FRAME_WIDTH-W)/2, (MainFrame.FRAME_HEIGHT-H)/2, W, H);
+		containerPanel.setBounds((ApplicationContext.FRAME_WIDTH-W)/2, (ApplicationContext.FRAME_HEIGHT-H)/2, W, H);
 		this.add(containerPanel);
 		
 		initView();
@@ -74,15 +69,15 @@ public class LoginPanel extends JPanel implements ActionListener {
 	private void initView() {
 		Response res = null;
 		try {
-			res = Jsoup.connect(Config.LOGIN_PAGE).timeout(30000).execute();
+			res = Jsoup.connect(ApplicationContext.LOGIN_PAGE).timeout(30000).execute();
 		} catch (UnknownHostException e) {
 			JOptionPane.showMessageDialog(this, "无法链接到服务器", "网络故障", JOptionPane.ERROR_MESSAGE); 
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		MainFrame.setCookiesMap(res.cookies());
-        Set<Entry<String, String>> entrySet = MainFrame.getCookiesMap().entrySet();
+		ApplicationContext.setCookiesMap(res.cookies());
+        Set<Entry<String, String>> entrySet = ApplicationContext.getCookiesMap().entrySet();
         String cookiesStr = "";
         for (Map.Entry<String, String> entry : entrySet) {  
             cookiesStr = cookiesStr + entry.getKey() + "=" + entry.getValue()+";";
@@ -99,8 +94,8 @@ public class LoginPanel extends JPanel implements ActionListener {
 		this.lablpassWord.setFont(lablFont);
 		this.lablImgCode.setFont(lablFont);
 		
-		this.imgNumCode = new ImageCodePanel(Config.NUM_CODE_PATH, cookiesStr);
-		this.imgABCCode = new ImageCodePanel(Config.ABC_CODE_PATH, cookiesStr);
+		this.imgNumCode = new ImageCodePanel(ApplicationContext.NUM_CODE_PATH, cookiesStr);
+		this.imgABCCode = new ImageCodePanel(ApplicationContext.ABC_CODE_PATH, cookiesStr);
 		this.txtUserName = new JTextField("32016");
 		this.txtPassWord = new JPasswordField();
 		this.txtNumCode = new JTextField();
@@ -145,6 +140,12 @@ public class LoginPanel extends JPanel implements ActionListener {
 		this.txtABCCode.setVisible(false);
 		
 		this.btnLogin.addActionListener(this);
+
+		this.setTitle(ApplicationContext.FRAME_TITLE+"v"+ApplicationContext.VERSION);
+		this.setBounds(0, 0, ApplicationContext.FRAME_WIDTH, ApplicationContext.FRAME_HEIGHT);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setResizable(false);
+		this.setVisible(true);
 	}
 	
 	public void login(String userName, String passWord, String numCode, String abcCode) {
@@ -163,8 +164,8 @@ public class LoginPanel extends JPanel implements ActionListener {
 			paramMap.put("verCode", abcCode);
 			paramMap.put("autoLogin", "true");
 			
-			Response response = Jsoup.connect(Config.LOGIN_ACTION)
-					.cookies(MainFrame.getCookiesMap())
+			Response response = Jsoup.connect(ApplicationContext.LOGIN_ACTION)
+					.cookies(ApplicationContext.getCookiesMap())
 					.data(paramMap)
 					.method(Connection.Method.POST)
 					.execute();
@@ -172,10 +173,12 @@ public class LoginPanel extends JPanel implements ActionListener {
 			String htmlContent = response.body();
 			Document doc = Jsoup.parse(htmlContent);
 			if ("苏州科技学院网络教学平台".equals(doc.title().trim())) {
-				MainFrame.setCookiesMap(response.cookies());
-				//显示学生作业面板
-				this.frameContainer.stuWorkListPanel.init();
-				this.cardLayout.show(this.frameContainer.getContentPane(), "work_list");
+				ApplicationContext.setCookiesMap(response.cookies());
+				//显示学生作业窗口
+				StudentWorkListFrame worklistFrame = new StudentWorkListFrame();
+				ApplicationContext.setWorkListFrame(worklistFrame);
+				//关闭当前窗口
+				this.dispose();
 			} else {
 				this.imgNumCode.rePaintImage();
 				this.imgABCCode.rePaintImage();
@@ -197,9 +200,9 @@ public class LoginPanel extends JPanel implements ActionListener {
 	}
 	
 	
-	
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent e) {
 		String userName = this.txtUserName.getText();
 		String passWord = this.txtPassWord.getText();

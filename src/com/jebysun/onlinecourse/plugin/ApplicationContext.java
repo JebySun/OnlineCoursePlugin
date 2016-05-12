@@ -1,6 +1,43 @@
-package com.jebysun.onlinecourse.plugin.parser;
+package com.jebysun.onlinecourse.plugin;
 
-public final class Config {
+import java.util.HashMap;
+import java.util.Map;
+
+import com.jebysun.onlinecourse.plugin.ui.StudentWorkListFrame;
+
+/**
+ * 项目公共资源容器
+ * @author JebySun
+ *
+ */
+public final class ApplicationContext {
+	
+	private static Map<String, String> cookiesMap = new HashMap<String, String>();
+	private static StudentWorkListFrame worklistFrame;
+	
+	public static Map<String, String> getCookiesMap() {
+		return ApplicationContext.cookiesMap;
+	}
+
+	public static void setCookiesMap(Map<String, String> _cookiesMap) {
+		ApplicationContext.cookiesMap = _cookiesMap;
+	}
+	
+	public static void setWorkListFrame(StudentWorkListFrame worklistFrame) {
+		ApplicationContext.worklistFrame = worklistFrame;
+	}
+	
+	public static StudentWorkListFrame getWorkListFrame() {
+		return ApplicationContext.worklistFrame;
+	}
+	
+	
+	public static final String FRAME_TITLE = "苏州科技大学学生作业批改程序";
+	public static final String VERSION = "1.1.0";
+	
+	//窗口尺寸
+	public static final int FRAME_WIDTH = 900;
+	public static final int FRAME_HEIGHT = 600;
 	
 	//用户登录界面
 	public static String LOGIN_PAGE = "http://passport2.usts.edu.cn/login?fid=1944&refer=http://wlkt.usts.edu.cn";
