@@ -182,6 +182,8 @@ public class LoginFrame extends JFrame implements ActionListener {
 			} else {
 				this.imgNumCode.rePaintImage();
 				this.imgABCCode.rePaintImage();
+				//解决图片验证码刷新界面重影问题。
+				this.repaint();
 				String errMsg = doc.getElementById("show_error").text().trim();
 				if (errMsg.indexOf("密码错误") != -1) {
 					JOptionPane.showMessageDialog(this, "帐号或者密码错误", "登录失败", JOptionPane.ERROR_MESSAGE); 
