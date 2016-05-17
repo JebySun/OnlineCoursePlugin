@@ -26,6 +26,8 @@ import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 
 import com.jebysun.onlinecourse.plugin.ApplicationContext;
+import com.jebysun.onlinecourse.plugin.action.LoginAction;
+import com.jebysun.onlinecourse.plugin.action.LoginAction.LoginActionListener;
 
 /**
  * 登录面板
@@ -148,69 +150,69 @@ public class LoginFrame extends JFrame implements ActionListener {
 		this.setVisible(true);
 	}
 	
-	public void login(String userName, String passWord, String numCode, String abcCode) {
-		try {
-			Map<String, String> paramMap = new HashMap<String, String>();
-			paramMap.put("pid", "-1");
-			paramMap.put("pidName", "");
-			paramMap.put("fid", "1944");
-			paramMap.put("fidName", "苏州科技学院");
-			paramMap.put("allowJoin", "0");
-			paramMap.put("isCheckNumCode", "1");
-			paramMap.put("f", "0");
-			paramMap.put("uname", userName);
-			paramMap.put("password", passWord);
-			paramMap.put("numcode", numCode);
-			paramMap.put("verCode", abcCode);
-			paramMap.put("autoLogin", "true");
-			
-			Response response = Jsoup.connect(ApplicationContext.LOGIN_ACTION)
-					.cookies(ApplicationContext.getCookiesMap())
-					.data(paramMap)
-					.method(Connection.Method.POST)
-					.execute();
-			
-			String htmlContent = response.body();
-			Document doc = Jsoup.parse(htmlContent);
-			if ("苏州科技学院网络教学平台".equals(doc.title().trim())) {
-				ApplicationContext.setCookiesMap(response.cookies());
+	public void doLogin(String userName, String passWord, String numCode, String abcCode) {
+		
+		LoginAction.login(userName, passWord, numCode, abcCode, new LoginActionListener() {
+			@Override
+			public void success() {
 				//显示学生作业窗口
 				StudentWorkListFrame worklistFrame = new StudentWorkListFrame();
 				ApplicationContext.setWorkListFrame(worklistFrame);
 				//关闭当前窗口
-				this.dispose();
-			} else {
-				this.imgNumCode.rePaintImage();
-				this.imgABCCode.rePaintImage();
-				//解决图片验证码刷新界面重影问题。
-				this.repaint();
-				String errMsg = doc.getElementById("show_error").text().trim();
-				if (errMsg.indexOf("密码错误") != -1) {
-					JOptionPane.showMessageDialog(this, "帐号或者密码错误", "登录失败", JOptionPane.ERROR_MESSAGE); 
-				} else if (errMsg.indexOf("验证码错误") != -1) {
-					JOptionPane.showMessageDialog(this, "验证码错误", "登录失败", JOptionPane.ERROR_MESSAGE); 
-				}
-				//需要输入英文验证码
-				if (htmlContent.indexOf("$(\"#verCode_tr\").removeClass(\"zl_tr_td_hide\");") != -1) {
-					this.imgABCCode.setVisible(true);
-					this.txtABCCode.setVisible(true);
+				LoginFrame.this.dispose();
+			}
+			
+			@Override
+			public void failed(String errType) {
+				if (errType.equals("密码错误")) {
+					JOptionPane.showMessageDialog(LoginFrame.this, "帐号或者密码错误", "登录失败", JOptionPane.ERROR_MESSAGE); 
+				} else if (errType.equals("验证码错误")) {
+					JOptionPane.showMessageDialog(LoginFrame.this, "验证码错误", "登录失败", JOptionPane.ERROR_MESSAGE); 
 				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			
+			@Override
+			public void refreshImageCode() {
+				LoginFrame.this.imgNumCode.rePaintImage();
+				LoginFrame.this.imgABCCode.rePaintImage();
+				//解决图片验证码刷新界面重影问题。
+				LoginFrame.this.repaint();
+			}
+			
+			@Override
+			public void showABCImageCode() {
+				LoginFrame.this.imgABCCode.setVisible(true);
+				LoginFrame.this.txtABCCode.setVisible(true);
+			}
+			
+		});	
+	}
+	
+	
+	
+	private void login() {
+		String userName = this.txtUserName.getText();
+		String passWord = this.txtPassWord.getText();
+		String numCode = this.txtNumCode.getText();
+		String abcCode = this.txtABCCode.getText();
+		
+		doLogin(userName, passWord, numCode, abcCode);
 	}
 	
 	
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent e) {
-		String userName = this.txtUserName.getText();
-		String passWord = this.txtPassWord.getText();
-		String numCode = this.txtNumCode.getText();
-		String abcCode = this.txtABCCode.getText();
-		login(userName, passWord, numCode, abcCode);
+		if (e.getSource() == this.btnLogin) {
+			login();
+		}
 	}
 	
+	
+	
 }
+
+
+
+
+
