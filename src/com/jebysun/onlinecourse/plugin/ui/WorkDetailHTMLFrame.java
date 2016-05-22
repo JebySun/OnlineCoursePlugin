@@ -25,7 +25,7 @@ import com.jebysun.onlinecourse.plugin.ApplicationContext;
 
 /**
  * 学生作业详情
- * @author Administrator
+ * @author JebySun
  *
  */
 public class WorkDetailHTMLFrame extends JFrame implements ActionListener {

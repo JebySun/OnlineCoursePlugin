@@ -9,28 +9,39 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import com.jebysun.onlinecourse.plugin.ApplicationContext;
+
+/**
+ * 登录验证码
+ * @author JebySun
+ *
+ */
 public class ImageCodePanel extends JPanel {
 	private static final long serialVersionUID = 4204888815709087566L;
 	private Image img;
 	private int imgWidth;
 	private int imgHeight;
 	private String strUrl;
-	private String requestHeader;
+	private Map<String, String> cookiesMap;
 	
-	public ImageCodePanel(String url, String requestHeader) {
+	public ImageCodePanel(String url, Map<String, String> cookiesMap) {
 		this.strUrl = url;
-		this.requestHeader = requestHeader;
+		this.cookiesMap = cookiesMap;
 		this.img = initImage();
 	}
 	
 	private Image initImage() {
 		Image img = null;
 		try {
-			InputStream is = getInputStream(this.requestHeader);
+			String requstCookieStr = mapToString(cookiesMap);
+			InputStream is = getInputStream(requstCookieStr);
 			BufferedImage bfImg = ImageIO.read(is); 
 			imgWidth = bfImg.getWidth();  
 			imgHeight = bfImg.getHeight();  
@@ -41,6 +52,15 @@ public class ImageCodePanel extends JPanel {
 			e.printStackTrace();
 		}
 		return img;
+	}
+	
+	private String mapToString(Map<String, String> cookiesMap) {
+        Set<Entry<String, String>> entrySet = cookiesMap.entrySet();
+        String cookiesStr = "";
+        for (Map.Entry<String, String> entry : entrySet) {  
+            cookiesStr = cookiesStr + entry.getKey() + "=" + entry.getValue()+";";
+        }  
+        return cookiesStr.substring(0, cookiesStr.length()-1);
 	}
 	
 	

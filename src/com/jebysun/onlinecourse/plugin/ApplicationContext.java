@@ -15,6 +15,7 @@ public final class ApplicationContext {
 	private static Map<String, String> cookiesMap = new HashMap<String, String>();
 	private static StudentWorkListFrame worklistFrame;
 	
+	
 	public static Map<String, String> getCookiesMap() {
 		return ApplicationContext.cookiesMap;
 	}

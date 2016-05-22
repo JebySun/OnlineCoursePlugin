@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -20,17 +19,15 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.Connection.Response;
-import org.jsoup.nodes.Document;
 
 import com.jebysun.onlinecourse.plugin.ApplicationContext;
 import com.jebysun.onlinecourse.plugin.action.LoginAction;
 import com.jebysun.onlinecourse.plugin.action.LoginAction.LoginActionListener;
 
 /**
- * 登录面板
+ * 登录窗口
  * @author JebySun
  *
  */
@@ -65,26 +62,22 @@ public class LoginFrame extends JFrame implements ActionListener {
 		containerPanel.setBounds((ApplicationContext.FRAME_WIDTH-W)/2, (ApplicationContext.FRAME_HEIGHT-H)/2, W, H);
 		this.add(containerPanel);
 		
+		initCookie();
 		initView();
 	}
 	
-	private void initView() {
+	private void initCookie() {
 		Response res = null;
 		try {
 			res = Jsoup.connect(ApplicationContext.LOGIN_PAGE).timeout(30000).execute();
-		} catch (UnknownHostException e) {
+			ApplicationContext.setCookiesMap(res.cookies());
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, "无法链接到服务器", "网络故障", JOptionPane.ERROR_MESSAGE); 
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		ApplicationContext.setCookiesMap(res.cookies());
-        Set<Entry<String, String>> entrySet = ApplicationContext.getCookiesMap().entrySet();
-        String cookiesStr = "";
-        for (Map.Entry<String, String> entry : entrySet) {  
-            cookiesStr = cookiesStr + entry.getKey() + "=" + entry.getValue()+";";
-        }  
-        cookiesStr = cookiesStr.substring(0, cookiesStr.length()-1);
+	}
+	
+	private void initView() {
 		this.lablLoginTitle = new JLabel("苏州科技大学学生作业批改程序");
 		this.lablLoginTitle.setFont((new Font(Font.SERIF, Font.BOLD, 22)));
 		
@@ -96,8 +89,8 @@ public class LoginFrame extends JFrame implements ActionListener {
 		this.lablpassWord.setFont(lablFont);
 		this.lablImgCode.setFont(lablFont);
 		
-		this.imgNumCode = new ImageCodePanel(ApplicationContext.NUM_CODE_PATH, cookiesStr);
-		this.imgABCCode = new ImageCodePanel(ApplicationContext.ABC_CODE_PATH, cookiesStr);
+		this.imgNumCode = new ImageCodePanel(ApplicationContext.NUM_CODE_PATH, ApplicationContext.getCookiesMap());
+		this.imgABCCode = new ImageCodePanel(ApplicationContext.ABC_CODE_PATH, ApplicationContext.getCookiesMap());
 		this.txtUserName = new JTextField("32016");
 		this.txtPassWord = new JPasswordField();
 		this.txtNumCode = new JTextField();

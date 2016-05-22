@@ -37,6 +37,11 @@ import org.jsoup.select.Elements;
 import com.jebysun.onlinecourse.plugin.ApplicationContext;
 import com.jebysun.onlinecourse.plugin.util.JavaUtil;
 
+/**
+ * 学生作业列表
+ * @author JebySun
+ *
+ */
 public class StudentWorkListFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 4866331079665681296L;
 	private JLabel labLoginedUser;
@@ -150,7 +155,10 @@ public class StudentWorkListFrame extends JFrame implements ActionListener {
 		}
 	}
 	
-	
+	/**
+	 * 获取学生作业列表前的必要请求，目的是已获得必要的Cookie
+	 * @param strUrl
+	 */
 	public void tempRequest(String strUrl) {
 		try {
 			Response response = Jsoup.connect(strUrl)
