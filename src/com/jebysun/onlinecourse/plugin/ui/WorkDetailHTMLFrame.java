@@ -236,7 +236,7 @@ public class WorkDetailHTMLFrame extends JFrame implements ActionListener {
 				//关闭窗口
 				this.dispose();
 				//刷新列表
-				ApplicationContext.getWorkListFrame().listPage(Integer.parseInt(this.pageNum));
+//				((MainFrame)ApplicationContext.getMainFrame()).listPage(Integer.parseInt(this.pageNum));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

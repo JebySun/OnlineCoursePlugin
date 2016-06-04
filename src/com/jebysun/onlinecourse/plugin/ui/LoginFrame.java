@@ -4,11 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -69,7 +64,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 	private void initCookie() {
 		Response res = null;
 		try {
-			res = Jsoup.connect(ApplicationContext.LOGIN_PAGE).timeout(30000).execute();
+			res = Jsoup.connect(ApplicationContext.LOGIN_PAGE).timeout(5*1000).execute();
 			ApplicationContext.setCookiesMap(res.cookies());
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, "无法链接到服务器", "网络故障", JOptionPane.ERROR_MESSAGE); 
@@ -149,8 +144,8 @@ public class LoginFrame extends JFrame implements ActionListener {
 			@Override
 			public void success() {
 				//显示学生作业窗口
-				StudentWorkListFrame worklistFrame = new StudentWorkListFrame();
-				ApplicationContext.setWorkListFrame(worklistFrame);
+				MainFrame frame = new MainFrame();
+				ApplicationContext.setMainFrame(frame);
 				//关闭当前窗口
 				LoginFrame.this.dispose();
 			}

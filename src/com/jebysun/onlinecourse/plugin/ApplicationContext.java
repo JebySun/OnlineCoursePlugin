@@ -2,9 +2,7 @@ package com.jebysun.onlinecourse.plugin;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import com.jebysun.onlinecourse.plugin.ui.StudentWorkListFrame;
-
+import javax.swing.JFrame;
 /**
  * 项目公共资源容器
  * @author JebySun
@@ -13,7 +11,8 @@ import com.jebysun.onlinecourse.plugin.ui.StudentWorkListFrame;
 public final class ApplicationContext {
 	
 	private static Map<String, String> cookiesMap = new HashMap<String, String>();
-	private static StudentWorkListFrame worklistFrame;
+	private static Map<String, String> dataMap = new HashMap<String, String>();
+	private static JFrame worklistFrame;
 	
 	
 	public static Map<String, String> getCookiesMap() {
@@ -24,17 +23,25 @@ public final class ApplicationContext {
 		ApplicationContext.cookiesMap = _cookiesMap;
 	}
 	
-	public static void setWorkListFrame(StudentWorkListFrame worklistFrame) {
+	public static void putData(String key, String value) {
+		ApplicationContext.dataMap.put(key, value);
+	}
+	
+	public static String getData(String key) {
+		return ApplicationContext.dataMap.get(key);
+	}
+
+	public static void setMainFrame(JFrame worklistFrame) {
 		ApplicationContext.worklistFrame = worklistFrame;
 	}
 	
-	public static StudentWorkListFrame getWorkListFrame() {
+	public static JFrame getMainFrame() {
 		return ApplicationContext.worklistFrame;
 	}
 	
 	
 	public static final String FRAME_TITLE = "苏州科技大学学生作业批改程序";
-	public static final String VERSION = "1.1.0";
+	public static final String VERSION = "2.0.0";
 	
 	//窗口尺寸
 	public static final int FRAME_WIDTH = 900;
@@ -44,17 +51,22 @@ public final class ApplicationContext {
 	public static String LOGIN_PAGE = "http://passport2.usts.edu.cn/login?fid=1944&refer=http://wlkt.usts.edu.cn";
 	//登录动作执行URL
 	public static String LOGIN_ACTION = "http://passport2.usts.edu.cn/login?refer=http%3A%2F%2Fwlkt.usts.edu.cn";
-	//登录用户信息
-	public static String USER_INFO_PAGE = "http://www.fanya.usts.edu.cn/passport/allHead.shtml?fid=1944";
+	//教学空间首页
+	public static String TECH_ZONE = "http://i.mooc.usts.edu.cn/space/index.shtml";
 	
 	//数字验证码地址
 	public static String NUM_CODE_PATH = "http://passport2.usts.edu.cn/num/code";
 	//字母验证码地址
 	public static String ABC_CODE_PATH = "http://passport2.usts.edu.cn/img/code";
 	
-	//课程查看地址（需要先执行查看课程，才能查看学生作业列表）
+	//【过时】课程查看地址（需要先执行查看课程，才能查看学生作业列表）
 	public static String COURSE_PAGE = "http://mooc1.usts.edu.cn/mycourse/teachercourse?moocId=81300811&clazzid=306870&edit=true";
-	//学生作业列表页面
+	
+	//课程下作业列表
+	public static String TASK_LIST = "http://mooc1.usts.edu.cn/work/getAllWork?classId=$&courseId=$&isdisplaytable=2&mooc=1&ut=t";
+	
+	
+	//【过时】学生作业列表页面
 	public static String STUDENT_WORK_PAGE = "http://mooc1.usts.edu.cn/work/reviewTheList?courseId=81300811&classId=306870&workId=181277&isdisplaytable=2&mooc=1&isWork=true";
 	//学生作业列表实际动作执行URL
 	public static String WORK_QUERY_ACTION = "http://mooc1.usts.edu.cn/work/searchMarkList";

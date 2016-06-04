@@ -17,7 +17,7 @@ public class JavaUtil {
     }
     
     /**
-     * 去除固定数组尾部的空白元素
+     * 去除数组尾部的空白
      * @param objArr
      * @return
      */
@@ -33,6 +33,24 @@ public class JavaUtil {
     	Object[][] desArr = new Object[length][objArr[0].length];
     	System.arraycopy(objArr, 0, desArr, 0, length);
     	return desArr;
+    }
+    
+    /**
+     * 获取url的指定参数值
+     * @param url
+     * @param key
+     * @return
+     */
+    public static String getUrlParamValue(String url, String key) {
+    	url = url.substring(url.indexOf("?")+1);
+    	String[] paramArr = url.split("&");
+    	for (String param : paramArr) {
+    		String[] keyValueArr = param.split("=");
+    		if (keyValueArr[0].equals(key)) {
+    			return keyValueArr[1];
+    		}
+    	}
+    	return null;
     }
     
 }
