@@ -59,15 +59,9 @@ public final class ApplicationContext {
 	//字母验证码地址
 	public static String ABC_CODE_PATH = "http://passport2.usts.edu.cn/img/code";
 	
-	//【过时】课程查看地址（需要先执行查看课程，才能查看学生作业列表）
-	public static String COURSE_PAGE = "http://mooc1.usts.edu.cn/mycourse/teachercourse?moocId=81300811&clazzid=306870&edit=true";
-	
 	//课程下作业列表
 	public static String TASK_LIST = "http://mooc1.usts.edu.cn/work/getAllWork?classId=$&courseId=$&isdisplaytable=2&mooc=1&ut=t";
 	
-	
-	//【过时】学生作业列表页面
-	public static String STUDENT_WORK_PAGE = "http://mooc1.usts.edu.cn/work/reviewTheList?courseId=81300811&classId=306870&workId=181277&isdisplaytable=2&mooc=1&isWork=true";
 	//学生作业列表实际动作执行URL
 	public static String WORK_QUERY_ACTION = "http://mooc1.usts.edu.cn/work/searchMarkList";
 	
